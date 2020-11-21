@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+// import 'package:gradient_widgets/gradient_widgets.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Energy needs',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -21,8 +23,12 @@ class MyApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        // This makes the visual density adapt to the platform that you run
+        // the app on. For desktop platforms, the controls will be smaller and
+        // closer together (more dense) than on mobile platforms.
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'why are there so many titles'),
     );
   }
 }
@@ -46,68 +52,285 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  // int _counter = 0;
+  bool lightTheme = false;
+  // Color currentColor = Colors.limeAccent;
+  final _formKey = GlobalKey<FormState>();
 
-  void _incrementCounter() {
+
+  int age = 1;
+  double height = 1.0;
+  double weight = 1.0;
+  double activityLevel = .3;
+
+  double basal=0.0;
+  double exerciseExpenditure = 0.0;
+  double thermalFood = 0.0;
+
+  double calNeeds = 0.0;
+
+  double calMin=0.0;
+  double calMaintain=0.0;
+  double calMax=0.0;
+
+  double protein=0.0;
+
+  bool val = false;
+
+  bool slowMetabolism = false;
+  bool imperial = false;
+
+  //false for female
+  bool gender = false;
+
+  // void changeColor(Color color) => setState(() => currentColor = color);
+
+  void _calculate() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
+
+
+      basal = (247-(2.67*age)+(401.5*(height)) + (8.6*(weight)));
+      exerciseExpenditure = basal* activityLevel;
+      thermalFood = (basal+exerciseExpenditure)*.1;
+      calNeeds = basal + exerciseExpenditure + thermalFood;
+
+      protein = 1.6*weight;
+      if(slowMetabolism){
+        calNeeds*=0.9;
+      }
+
     });
   }
 
+  bool isNumeric(String s) {
+    if(s == null) {
+      return false;
+    }
+    return double.parse(s, (e) => null) != null;
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+    return Theme(
+      data: lightTheme ? ThemeData.light() : ThemeData.dark(),
+      child: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            title: GestureDetector(
+              child: Text('Energy needs'),
+              onDoubleTap: () => setState(() => lightTheme = !lightTheme),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            bottom: TabBar(
+              tabs: <Widget>[
+                const Tab(text: 'Calculator'),
+                const Tab(text: 'Resources'),
+                // const Tab(text: 'Block'),
+              ],
             ),
-          ],
+          ),
+          body: TabBarView( //adding more widgets to the child array of tabbar makes it think theyre more tabs
+            physics: const NeverScrollableScrollPhysics(),
+            children: <Widget>[
+
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: <Widget>[
+                        Wrap(
+                          runSpacing:-25,
+                          children: <Widget>[
+                            RadioListTile(
+                              title: const Text("Male"),
+                              value: true,
+                              groupValue: gender,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (bool value){
+                                setState(() {
+                                  gender=value;
+                                });
+                              },
+                            ),
+                            RadioListTile(
+                              title: const Text("Female"),
+                              value: false,
+                              groupValue: gender,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (bool value){
+                                setState(() {
+                                  gender=value;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+
+                        Row(
+                          children: <Widget>[
+                            Checkbox(
+                              value: slowMetabolism,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (bool value){
+                                setState(() {
+                                  slowMetabolism=value;
+                                });
+                              },
+                            ),
+                            Text(
+                              "Check for slow metabolism."
+                            )
+                          ],
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            hintText: 'Enter your age',
+                          ),
+                          validator: (a) {
+                            if (!isNumeric(a)) {
+                              return 'Please enter a valid age';
+                            }
+                            age = int.parse(a);
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            hintText: 'Enter your height in inches',
+                          ),
+                          validator: (h) {
+                            if (!isNumeric(h)) {
+                              return 'Please enter a valid height';
+                            }
+                            height = int.parse(h)/39.37;
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            hintText: 'Enter your weight in lbs',
+                          ),
+                          validator: (w) {
+                            if (!isNumeric(w)) {
+                              return 'Please enter a valid weight';
+                            }
+                            weight = int.parse(w)/2.20462;
+                            return null;
+                          },
+                        ),
+
+                        Wrap(
+                          runSpacing: -20,
+                          children: <Widget>[
+                            //activity level form
+                            RadioListTile(
+                              title: const Text("Sedentary Activity"),
+                              value: .3,
+                              groupValue: activityLevel,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (double value){
+                                setState(() {
+                                  activityLevel=value;
+                                });
+                              },
+                            ),
+                            // SizedBox(height:1),
+                            RadioListTile(
+                              title: const Text("Lightly Active"),
+                              value: .5,
+                              groupValue: activityLevel,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (double value){
+                                setState(() {
+                                  activityLevel=value;
+                                });
+                              },
+                            ),
+                            RadioListTile(
+                              title: const Text("Moderate Activity"),
+                              value: .6,
+                              groupValue: activityLevel,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (double value){
+                                setState(() {
+                                  activityLevel=value;
+                                });
+                              },
+                            ),
+                            RadioListTile(
+                              title: const Text("Very Active"),
+                              value: .9,
+                              groupValue: activityLevel,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (double value){
+                                setState(() {
+                                  activityLevel=value;
+                                });
+                              },
+                            ),
+                            RadioListTile(
+                              title: const Text("Extremely Active"),
+                              value: 1.2,
+                              groupValue: activityLevel,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (double value){
+                                setState(() {
+                                  activityLevel=value;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+
+
+
+                      ],
+                    ),
+                  ),
+
+                  RaisedButton(
+                    elevation: 3.0,
+                    onPressed: () {
+                      if(_formKey.currentState.validate()) {
+                        _calculate();
+                      }
+                    },
+                    child: const Text('calculate'),
+                    color: Colors.blueGrey,
+                    textColor: Colors.black54,
+                  ),
+
+                  Text(
+                    "Calorie Requirements: " +  calNeeds.round().toString(),
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    "Recommended protein (in grams): " + (1.2*weight).round().toString() + "-" + (1.6*weight).round().toString(),
+                    style: TextStyle(fontSize: 18),
+                  ),
+
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("example resource")
+                ],
+              ),
+
+            ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
