@@ -2,7 +2,7 @@
     package="com.example.energy_needs">
    <application
         android:label="energy_needs"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/energy_needs">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

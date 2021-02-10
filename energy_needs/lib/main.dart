@@ -78,7 +78,10 @@ class _MyHomePageState extends State<MyHomePage> {
   bool val = false;
 
   bool slowMetabolism = false;
-  bool imperial = false;
+
+  bool metric = false;
+  var heightHint = 'Enter your height in inches';
+  var weightHint = 'Enter your weight in pounds';
 
   //false for female
   bool gender = false;
@@ -94,7 +97,17 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
 
 
-      basal = (247-(2.67*age)+(401.5*(height)) + (8.6*(weight)));
+      if(metric){
+        weight = weight * 2.20462;
+        height = height * 39.37 / 100;
+      }
+
+      if(!gender){
+        basal = (247 - (2.67*age) + (401.5*(height)) + (8.6*(weight))); //female formula
+      }
+      else{
+        basal = (293 - (3.8*age) + (456.4*(height)) + (10.12*(weight))); //male formula
+      }
       exerciseExpenditure = basal* activityLevel;
       thermalFood = (basal+exerciseExpenditure)*.1;
       calNeeds = basal + exerciseExpenditure + thermalFood;
@@ -122,6 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: DefaultTabController(
         length: 2,
         child: Scaffold(
+          resizeToAvoidBottomPadding: false,
           appBar: AppBar(
             title: GestureDetector(
               child: Text('Energy needs'),
@@ -191,7 +205,34 @@ class _MyHomePageState extends State<MyHomePage> {
                             )
                           ],
                         ),
+
+                        Row(
+                          children: <Widget>[
+                            Checkbox(
+                              value: metric,
+                              activeColor: Colors.blueGrey,
+                              onChanged: (bool value){
+                                setState(() {
+                                  metric=value;
+                                  if(metric){
+                                    heightHint = 'Enter your height in centimeters';
+                                    weightHint = 'Enter your weight in kilograms';
+                                  }
+                                  else{
+                                    heightHint = 'Enter your height in inches';
+                                    weightHint = 'Enter your weight in pounds';
+                                  }
+                                });
+                              },
+                            ),
+                            Text(
+                                "Check if using metric units."
+                            )
+                          ],
+                        ),
+
                         TextFormField(
+                          keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                             hintText: 'Enter your age',
                           ),
@@ -204,20 +245,23 @@ class _MyHomePageState extends State<MyHomePage> {
                           },
                         ),
                         TextFormField(
-                          decoration: const InputDecoration(
-                            hintText: 'Enter your height in inches',
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: heightHint,
                           ),
                           validator: (h) {
                             if (!isNumeric(h)) {
                               return 'Please enter a valid height';
                             }
+
                             height = int.parse(h)/39.37;
                             return null;
                           },
                         ),
                         TextFormField(
-                          decoration: const InputDecoration(
-                            hintText: 'Enter your weight in lbs',
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: weightHint,
                           ),
                           validator: (w) {
                             if (!isNumeric(w)) {

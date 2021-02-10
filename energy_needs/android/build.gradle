@@ -1,3 +1,24 @@
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.File('key.properties')
+if(keystorePropertiesFule.exists()){
+	keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+signingConfigs{
+	release{
+		keyAlias keystoreProperties['keyAlias']
+		keyPassword keystoreProperties['keyPassword']
+		storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+		storePassword keystoreProperties['storePassword']
+	}
+}
+
+buildTypes{
+	release{
+		signingConfig signingConfigs.release
+	}
+}
+
 buildscript {
     ext.kotlin_version = '1.3.50'
     repositories {
