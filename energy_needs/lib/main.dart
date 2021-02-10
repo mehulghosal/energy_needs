@@ -112,7 +112,7 @@ class _MyHomePageState extends State<MyHomePage> {
       thermalFood = (basal+exerciseExpenditure)*.1;
       calNeeds = basal + exerciseExpenditure + thermalFood;
 
-      protein = 1.6*weight;
+      // protein = 1.6*weight;
       if(slowMetabolism){
         calNeeds*=0.9;
       }
